@@ -7,10 +7,11 @@ export const AddJobOpportunity=async(req,res)=>{
     const{idCompany}=req.params
     const {jobTitle,jobLocation,workingTime,seniorityLevel,jobDescription,technicalSkills,softSkills}=req.body
 
-    const company=await companyModel.findOne({idCompany,deletedAt:null,bannedAt:null})
+    const company=await companyModel.findOne({_id:idCompany,deletedAt:null,bannedAt:null})
     if(!company){
         return res.status(404).json({message:"company not found"})
     }
+    
     if(!company.HRs.some(id=>id.equals(userId)) && company.createdBy.toString()!==userId.toString()){
         return res.status(403).json({message:"You are not authorized to add this Job Opportunity"})
     }

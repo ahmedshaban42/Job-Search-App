@@ -141,7 +141,8 @@ export const validatejobId = {
 };
 
 
-export const getJopSchema = {
+
+export const getJobSchema = {
     query: Joi.object({
         jobTitle: Joi.string().max(20).min(3).optional().messages({
             "string.base": "jobTitle must be a text.",
@@ -164,20 +165,43 @@ export const getJopSchema = {
             "string.base": "jobDescription must be a text.",
             "string.max": "jobDescription must not exceed 1500 characters."
         }),
-        technicalSkills: Joi.array().items(Joi.string().messages({
-            "string.base": "Each skill must be a string.",
-            "string.empty": "Skills cannot be empty."
-        })).min(1).optional().messages({
+        technicalSkills: Joi.array().items(
+            Joi.string().trim().min(1).messages({
+                "string.base": "Each skill must be a string.",
+                "string.empty": "Skills cannot be empty.",
+                "string.min": "Each skill must have at least 1 character."
+            })
+        ).min(1).optional().messages({
             "array.base": "Technical skills must be an array.",
             "array.min": "You must provide at least one technical skill."
         }),
-        softSkills: Joi.array().items(Joi.string().messages({
-            "string.base": "Each skill must be a string.",
-            "string.empty": "Skills cannot be empty."
-        })).min(1).optional().messages({
+        softSkills: Joi.array().items(
+            Joi.string().trim().min(1).messages({
+                "string.base": "Each skill must be a string.",
+                "string.empty": "Skills cannot be empty.",
+                "string.min": "Each skill must have at least 1 character."
+            })
+        ).min(1).optional().messages({
             "array.base": "Soft skills must be an array.",
             "array.min": "You must provide at least one soft skill."
+        }),
+        companyName: Joi.string().min(3).max(50).optional().messages({
+            "string.base": "companyName must be a text.",
+            "string.min": "companyName must be at least 3 characters long.",
+            "string.max": "companyName must not exceed 50 characters."
+        }),
+        page: Joi.number().integer().min(1).optional().messages({
+            "number.base": "Page must be a number.",
+            "number.integer": "Page must be an integer.",
+            "number.min": "Page must be at least 1."
+        }),
+        limit: Joi.number().integer().min(1).max(100).optional().messages({
+            "number.base": "Limit must be a number.",
+            "number.integer": "Limit must be an integer.",
+            "number.min": "Limit must be at least 1.",
+            "number.max": "Limit must not exceed 100."
         })
     })
 };
+
 

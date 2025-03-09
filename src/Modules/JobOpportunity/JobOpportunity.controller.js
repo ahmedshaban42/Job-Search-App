@@ -10,7 +10,7 @@ import { role } from "../../constants/constants.js";
 import { AddJobOpportunity,updateJobeOpportunityData, deleteJobOpportunity,getJop } from "./services/JobOpportunity.service.js";
 
 import {AddJobOpportunitySchema,UpdateJobOpportunitySchema,
-    validatejobId,getJopSchema}from '../../Validators/JobOpportunity-schema.js'
+    validatejobId,getJobSchema}from '../../Validators/JobOpportunity-schema.js'
 
 JobOpportunity.post('/AddJobOpportunity/:idCompany',
     errorHandler(authenticationMiddleware()),
@@ -42,7 +42,7 @@ JobOpportunity.get('/getJop',
     errorHandler(authenticationMiddleware()),
     errorHandler(authorizationMiddleware(role.USER)),
     errorHandler(checkUserStatus()),
-    errorHandler(validationMW(getJopSchema)),
+    errorHandler(validationMW(getJobSchema)),
     errorHandler(getJop)
 )
 
