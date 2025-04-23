@@ -48,4 +48,5 @@ export const seniorityLevel={
     TEAM_LEAD:"Team-Lead",
     CTO:"CTO"
 }
-//( fresh, Junior, Mid-Level, Senior,Team-Lead, CTO )
+
+export const DocumentExtensions = ['image/jpeg'];

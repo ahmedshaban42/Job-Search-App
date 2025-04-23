@@ -23,6 +23,7 @@ const limit=rateLimit({
 
 const routerhandellar=(app,express)=>{
     app.use(limit)
+    app.use('/Assets',express.static('Assets'))
 
 
     app.use('/auth-user',Authusercontroller)

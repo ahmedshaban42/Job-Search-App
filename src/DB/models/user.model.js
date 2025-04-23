@@ -89,21 +89,11 @@ export const userShema=new mongoose.Schema(
             secure_url: { type: String, default: null },
             public_id: { type: String, default: null }
         },
-        coverPic: {
+        coverPic:[{
             secure_url: { type: String, default: null },
             public_id: { type: String, default: null }
-        },
-        OTP: [
-            {
-                code: { type: String, required: true },
-                type: {
-                    type: String,
-                    enum:Object.values(typrOfOtp),
-                    required: true
-                },
-                expiresIn: { type: Date, required: true }
-            }
-        ]
+        }],
+        
     },
     {timestamps:true}
 )

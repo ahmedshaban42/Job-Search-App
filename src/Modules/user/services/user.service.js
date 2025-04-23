@@ -1,6 +1,6 @@
 import { compareSync } from "bcrypt"
 import { userModel } from "../../../DB/models/user.model.js"
-
+import { cloudinary } from "../../../config/cloudinary.config.js"
 
 
 
@@ -108,5 +108,130 @@ export const SoftDeleteAccount=async(req,res)=>{
     await user.save()
     res.status(200).json({ message: "Account deleted successfully" });
 } 
+
+
+export const uploadProfilePicture=async(req,res)=>{
+    const {_id}=req.loggedinuser
+    const {file}=req
+
+    if(!file){
+        return res.status(404).json({message:"no file uploaded"})
+    }
+    
+    // store url in DB using full url
+    const url =`${req.protocol}://${req.headers.host}/${file.path}`
+    const user=await userModel.findByIdAndUpdate(_id,{profilePic:{secure_url:url}}, {new:true})
+
+
+
+    res.status(200).json({ message: "successfully",user});
+
+}
+
+
+
+export const uploadcoverPicture=async(req,res)=>{
+    const {_id}=req.loggedinuser
+    const {files}=req
+    if(!files?.length){
+        return res.status(404).json({message:"no file uploaded"})
+    }
+
+    const images=files.map(file=> `${req.protocol}://${req.headers.host}/${file.path}`)
+
+    const user=await userModel.findByIdAndUpdate(_id,{coverPic:{secure_url:images}}, {new:true})
+
+
+
+    res.status(200).json({ message: "successfully",user});
+}
+
+
+
+export const uploadProfilePictureCloud=async(req,res)=>{
+    const {_id}=req.loggedinuser
+    const {file}=req
+    if(!file){
+        return res.status(400).json({message:'no file uploaded'})
+    }
+
+    const {secure_url,public_id}=await cloudinary().uploader.upload(file.path,{
+        folder:`${process.env.CLOUDINARY_FOLDER}/user/profile`
+    })
+
+    const user=await userModel.findByIdAndUpdate(_id,{profilePic:{secure_url,public_id}}, {new:true})
+
+    res.status(200).json({ message: "successfully",user});
+
+
+}
+
+export const uploadProfileCoverCloud=async(req,res)=>{
+    const {_id}=req.loggedinuser
+    const {files}=req
+    if(!files){
+        return res.status(400).json({message:'no file uploaded'})
+    }
+    
+
+    const images=[]
+    for(const file of files){
+        const {secure_url,public_id}=await cloudinary().uploader.upload(file.path,{
+            folder:`${process.env.CLOUDINARY_FOLDER}/user/cover`
+        })
+        images.push({secure_url,public_id})
+
+    }
+
+    const user=await userModel.findByIdAndUpdate(_id,{coverPic:images})
+    res.status(200).json({ message: "successfully",user});
+}
+
+export const deleteProfilePictureCloud=async (req,res)=>{
+    const {_id}=req.loggedinuser
+    const user=await userModel.findById(_id)
+    if(!user){
+        return res.status(404).json({message:'user not found'})
+    }
+    if(user.profilePic===null  || !user.profilePic.public_id){
+        return res.status(400).json({message:'no profile picture to delete'})
+    }
+
+    const ProfilePicture=user.profilePic.public_id
+    const data=await cloudinary().uploader.destroy(ProfilePicture)
+    if (data.result !== "ok") {
+        return res.status(500).json({ message: "Failed to delete profile picture from Cloudinary", error: data });
+    }
+
+    await userModel.updateOne({_id},{ profilePic: { secure_url: null, public_id: null } })
+    res.status(200).json({ message: "delete profile picture successfully",data});
+
+}
+export const deleteCoverPictureCloud=async (req,res)=>{
+    const {_id}=req.loggedinuser
+    const user=await userModel.findById(_id)
+    if(!user){
+        return res.status(404).json({message:'user not found'})
+    }
+    if(!user.coverPic.length){
+        return res.status(400).json({message:'no covers pictures to delete'})
+    }
+
+    const coversPicture=user.coverPic.map(id=>id.public_id)
+    console.log(coversPicture)
+    const data=await cloudinary().api.delete_resources(coversPicture)
+
+
+    await userModel.updateOne({_id},
+        { 
+            $set: { 
+                coverPic: []
+            } 
+        }
+    )
+    res.status(200).json({ message: "delete profile picture successfully",data});
+
+}
+
 
 

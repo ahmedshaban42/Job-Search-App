@@ -105,7 +105,7 @@ export const signInUser=async(req,res)=>{
         return res.status(400).json({message:'email or password not valid'})
     }
     const accesstoken=generateToken({
-        data:{_id:user._id,role:user.role,username:user.username},
+        data:{_id:user._id , role:user.role , username:user.username},
         sk:process.env.JWT_ACCESS_TOKEN_SECRETKEY_LOGIN,
         options:{expiresIn:process.env.JWT_ACCESS_TOKEN_EXP_LOGIN,jwtid:uuidv4()}
     })
@@ -116,8 +116,6 @@ export const signInUser=async(req,res)=>{
         opoptions:{expiresIn:process.env.JWT_REFRESH_TOKEN_EXP_LOGIN,jwtid:uuidv4()}
     })
     res.status(200).json({message:'login susseccfully',accesstoken,refreshtoken})
-
-
 }
 
 

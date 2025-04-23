@@ -1,5 +1,6 @@
 
 import mongoose from "mongoose";
+import { jobOpportunityModel } from "./Job-opportunity.model.js";
 
 
 export const companySchema=new mongoose.Schema(
@@ -82,4 +83,31 @@ companySchema.virtual('jobs', {
     foreignField: 'companyId'
 });
 
+companySchema.pre('save',async function(next) {
+    if(this.isModified('deletedAt')&&this.deletedAt){
+        return await jobOpportunityModel.deleteMany({companyId:this._id})
+    }
+})
 export const companyModel=mongoose.models.Company||mongoose.model('Company',companySchema)
+
+
+
+
+
+// companySchema.pre("save", async function (next) {
+//     if (this.isModified("deletedAt") && this.deletedAt) {
+//         // حذف جميع الوظائف المرتبطة بهذه الشركة
+//         const deletedJobs = await jobModel.find({ companyId: this._id });
+
+//         if (deletedJobs.length > 0) {
+//             const jobIds = deletedJobs.map(job => job._id); // جمع الـ jobIds المرتبطة
+
+//             // حذف جميع التطبيقات المرتبطة بالوظائف التي تم حذفها
+//             await applicationModel.deleteMany({ jobId: { $in: jobIds } });
+
+//             // حذف جميع الوظائف نفسها
+//             await jobModel.deleteMany({ companyId: this._id });
+//         }
+//     }
+//     next();
+// });
